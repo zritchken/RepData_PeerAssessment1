@@ -1,9 +1,4 @@
----
-title: "Reproducible Research: Peer Assessment 1"
-output: 
-  html_document:
-    keep_md: true
----
+# Reproducible Research: Peer Assessment 1
 
 
 ## Loading and preprocessing the data
@@ -14,7 +9,8 @@ output:
 ####and load in the *activity.csv* file in the **activity** folder.
 
 <br>
-```{r simulation,echo=TRUE}
+
+```r
 setwd("C:/Users/Zachary/Data Science/Reproducible Data/RepData_PeerAssessment1")
 Dat <- read.csv("./activity/activity.csv")
 ```
@@ -22,15 +18,35 @@ Dat <- read.csv("./activity/activity.csv")
 
 ####Let's take a look at the summary of our data:
 <br>
-```{r summary,echo=TRUE}
+
+```r
 summary(Dat)
+```
+
+```
+##      steps                date          interval     
+##  Min.   :  0.00   2012-10-01:  288   Min.   :   0.0  
+##  1st Qu.:  0.00   2012-10-02:  288   1st Qu.: 588.8  
+##  Median :  0.00   2012-10-03:  288   Median :1177.5  
+##  Mean   : 37.38   2012-10-04:  288   Mean   :1177.5  
+##  3rd Qu.: 12.00   2012-10-05:  288   3rd Qu.:1766.2  
+##  Max.   :806.00   2012-10-06:  288   Max.   :2355.0  
+##  NA's   :2304     (Other)   :15840
 ```
 <br>
 
 ####and a str, too:
 <br>
-```{r str, echo=TRUE}
+
+```r
 str(Dat)
+```
+
+```
+## 'data.frame':	17568 obs. of  3 variables:
+##  $ steps   : int  NA NA NA NA NA NA NA NA NA NA ...
+##  $ date    : Factor w/ 61 levels "2012-10-01","2012-10-02",..: 1 1 1 1 1 1 1 1 1 1 ...
+##  $ interval: int  0 5 10 15 20 25 30 35 40 45 ...
 ```
 <br>
 
@@ -51,7 +67,8 @@ str(Dat)
 
 ####First we'll make a histogram of total number of steps per day for each date in the Dataset. To do this, we'll have to create a summarized data frame using plyr. Our new column is called $sum.
 <br>
-```{r summarize steps, echo=TRUE}
+
+```r
 library(plyr)
 MeanSteps <- ddply(Dat,.(date),summarise,sum=sum(steps))
 ```
@@ -59,7 +76,8 @@ MeanSteps <- ddply(Dat,.(date),summarise,sum=sum(steps))
 
 ####We should add assign each day an integer 1 to 61 so that our x-axis isn't cluttered with dates. We'll also remove days with NA values.
 <br>
-```{r addcol, echo=TRUE}
+
+```r
 MeanSteps$day <- seq(1:61)
 MeanSteps <- na.omit(MeanSteps)
 ```
@@ -67,21 +85,34 @@ MeanSteps <- na.omit(MeanSteps)
 
 ####Then let's make a histogram with qplot.
 <br>
-```{r meanplot, echo=TRUE}
+
+```r
 library(ggplot2)
 q <- qplot(day,sum,data=MeanSteps,ylab="Total Steps",xlab="Day")
 print(q)
 ```
+
+![](PA1_template_files/figure-html/meanplot-1.png) 
 <br>
 
 ####Calculating the **mean** and **median** steps is easy from here.
 <br>
-```{r meancalc,echo=TRUE}
+
+```r
 mean(MeanSteps$sum)
 ```
+
+```
+## [1] 10766.19
+```
 <br>
-```{r medcalc,echo=TRUE}
+
+```r
 median(MeanSteps$sum)
+```
+
+```
+## [1] 10765
 ```
 <br>
 
@@ -92,17 +123,26 @@ median(MeanSteps$sum)
 ####We'll take a similar approach as we did before, except now we'll use ddply with the interval column so that interval is our x-axis. Note now we're summarising on **mean** instead of **sum**.
 <br>
 
-```{r summarizesteps, echo=TRUE}
+
+```r
 MeanIntervals <- ddply(Dat,.(interval),summarise,mean=mean(steps,na.rm=TRUE))
 IntervalPlot <- plot(MeanIntervals$interval,MeanIntervals$mean,type="l",xlab="Interval",ylab="Mean Steps",col="4")
 ```
+
+![](PA1_template_files/figure-html/summarizesteps-1.png) 
 <br>
 
 ####The second part asks us to find the interval where number of steps is highest across all days. We'll use the MeanIntervals data frame and subset for the max mean step value.
 <br>
 
-```{r maxsteps,echo=TRUE}
+
+```r
 subset(MeanIntervals,MeanIntervals$mean==max(MeanIntervals$mean))
+```
+
+```
+##     interval     mean
+## 104      835 206.1698
 ```
 <br>
 
@@ -115,9 +155,14 @@ subset(MeanIntervals,MeanIntervals$mean==max(MeanIntervals$mean))
 ####To calculate the number of missing values in *Dat*, we can just subset to NA values:
 <br>
 
-```{r subNA,echo=TRUE}
+
+```r
 justNA <- Dat[is.na(Dat),]
 dim(justNA)
+```
+
+```
+## [1] 2304    3
 ```
 <br>
 
@@ -127,7 +172,8 @@ dim(justNA)
 ####We already have an existing data frame called *MeanIntervals* where we calculated mean step for each interval. We'll use this frame to overwrite the *justNA* table we made in the earlier step. The *rep* function will repeat the list 8 times because there are eight days we need to overwrite.
 <br>
 
-```{r overwrite,echo=TRUE}
+
+```r
 justNA$steps <- rep(MeanIntervals$mean,times=8)
 ```
 <br>
@@ -135,7 +181,8 @@ justNA$steps <- rep(MeanIntervals$mean,times=8)
 ####Let's use the merge function to merge *Dat* and *justNA* to create *NewDat*. We can now remove NA values again, and we should be left with all non-NA values.
 <br>
 
-```{r join,echo=TRUE}
+
+```r
 NewDat <- merge(Dat,justNA,all.x=TRUE,all.y=TRUE)
 NewDat <- na.omit(NewDat)
 ```
@@ -144,20 +191,33 @@ NewDat <- na.omit(NewDat)
 ####We'll now repeat the steps we did earlier in the assignment to find the mean and median total number of steps taken per day.
 <br>
 
-```{rnewhist,echo=TRUE}
+
+```r
 MeanStepsNew <- ddply(NewDat,.(date),summarise,sum=sum(steps))
 MeanStepsNew$day <- seq(1:61)
 qNew <- qplot(day,sum,data=MeanStepsNew,ylab="Total Steps",xlab="Day")
 print(qNew)
 ```
+
+![](PA1_template_files/figure-html/newhist-1.png) 
 <br>
 
-```{r meancalc2,echo=TRUE}
+
+```r
 mean(MeanStepsNew$sum)
 ```
+
+```
+## [1] 10766.19
+```
 <br>
-```{r mediancalc2,echo=TRUE}
+
+```r
 median(MeanStepsNew$sum)
+```
+
+```
+## [1] 10766.19
 ```
 <br>
 
@@ -169,19 +229,25 @@ median(MeanStepsNew$sum)
 
 ####First we'll add a factor variable *daytype* to NewDat. Before we can do that, we'll convert *date* from a factor variable to a date, then use *weekdays()* to turn those days into characters, and finally *factor()* to create our factors. Let's go!
 <br>
-```{rcreatefactors,echo=TRUE}
+
+```r
 NewDat$date <- as.Date(NewDat$date,"%Y-%m-%d")
 NewDat$date <- weekdays(NewDat$date)
 NewDat$daytype <- factor(NewDat$date)
 levels(NewDat$daytype) <- list(Weekday=c("Monday","Tuesday","Wednesday","Thursday","Friday"),Weekend=c("Saturday","Sunday"))
 str(NewDat$daytype)
 ```
+
+```
+##  Factor w/ 2 levels "Weekday","Weekend": 1 1 1 1 1 1 1 1 1 1 ...
+```
 <br>
 
 ####Now let's make our plot. But before we can, we'll use ddply twice to summarize the mean steps data for both weekday and weekends, and then we'll rbind those tables to create one table with the summaries for both weekends and weekdays. This final table will be called **AllIntervalMeans**.
 <br>
 
-```{rsummarizeweekends,echo=TRUE}
+
+```r
 WkndMeanIntervals <- ddply(subset(NewDat,NewDat$daytype=="Weekend"),.(interval),summarise,mean=mean(steps,na.rm=TRUE))
 WkndMeanIntervals$type <- factor("Weekend")
 WkdayMeanIntervals <- ddply(subset(NewDat,NewDat$daytype=="Weekday"),.(interval),summarise,mean=mean(steps,na.rm=TRUE))
@@ -193,10 +259,13 @@ AllIntervalMeans <- rbind(WkndMeanIntervals,WkdayMeanIntervals)
 ####Now let's make a lattice graph and be done!
 <br>
 
-```{r makegraph,echo=TRUE}
+
+```r
 library(lattice)
 xyplot(AllIntervalMeans$mean ~ AllIntervalMeans$interval | AllIntervalMeans$type,AllIntervalMeans,type="l",layout=c(1,2),xlab="Interval",ylab="Number of Steps")
 ```
+
+![](PA1_template_files/figure-html/makegraph-1.png) 
 <br>
 
 ####Comparing these graphs, a lot of things make sense. It appears subjects aren't as active in the mornings on weekends (they are probably sleeping in!) and are more active between 9:30AM and 4:00 PM than during the week (not at work so probably not sitting down).
