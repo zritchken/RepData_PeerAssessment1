@@ -5,8 +5,8 @@
  
 <br>
  
-####First we will change our directory to the RepData_PeerAssessment1 folder
-####and load in the *activity.csv* file in the **activity** folder.
+First we will change our directory to the RepData_PeerAssessment1 folder
+and load in the *activity.csv* file in the **activity** folder.
 
 <br>
 
@@ -16,7 +16,7 @@ Dat <- read.csv("./activity/activity.csv")
 ```
 <br>
 
-####Let's take a look at the summary of our data:
+Let's take a look at the summary of our data:
 <br>
 
 ```r
@@ -35,7 +35,7 @@ summary(Dat)
 ```
 <br>
 
-####and a str, too:
+and a str, too:
 <br>
 
 ```r
@@ -50,7 +50,7 @@ str(Dat)
 ```
 <br>
 
-#### So it appears we have three variables: 
+ So it appears we have three variables: 
 <br>
 *steps* which is an integer, but has some missing values.    
 *date* which is a factor consisting of 61 unique dates in the form YYYY-MM-DD with 288 observations each.  
@@ -58,14 +58,14 @@ str(Dat)
 
 <br>
 
-#### Let's move on.
+ Let's move on.
 <br>
 
 ## What is mean total number of steps taken per day?
 <br>
 
 
-####First we'll make a histogram of total number of steps per day for each date in the Dataset. To do this, we'll have to create a summarized data frame using plyr. Our new column is called $sum.
+First we'll make a histogram of total number of steps per day for each date in the Dataset. To do this, we'll have to create a summarized data frame using plyr. Our new column is called $sum.
 <br>
 
 ```r
@@ -74,7 +74,7 @@ MeanSteps <- ddply(Dat,.(date),summarise,sum=sum(steps))
 ```
 <br>
 
-####We should add assign each day an integer 1 to 61 so that our x-axis isn't cluttered with dates. We'll also remove days with NA values.
+We should add assign each day an integer 1 to 61 so that our x-axis isn't cluttered with dates. We'll also remove days with NA values.
 <br>
 
 ```r
@@ -83,7 +83,7 @@ MeanSteps <- na.omit(MeanSteps)
 ```
 <br>
 
-####Then let's make a histogram with qplot.
+Then let's make a histogram with qplot.
 <br>
 
 ```r
@@ -95,7 +95,7 @@ print(q)
 ![](PA1_template_files/figure-html/meanplot-1.png) 
 <br>
 
-####Calculating the **mean** and **median** steps is easy from here.
+Calculating the **mean** and **median** steps is easy from here.
 <br>
 
 ```r
@@ -120,7 +120,7 @@ median(MeanSteps$sum)
 ## What is the average daily activity pattern?
 <br>
 
-####We'll take a similar approach as we did before, except now we'll use ddply with the interval column so that interval is our x-axis. Note now we're summarising on **mean** instead of **sum**.
+We'll take a similar approach as we did before, except now we'll use ddply with the interval column so that interval is our x-axis. Note now we're summarising on **mean** instead of **sum**.
 <br>
 
 
@@ -132,7 +132,7 @@ IntervalPlot <- plot(MeanIntervals$interval,MeanIntervals$mean,type="l",xlab="In
 ![](PA1_template_files/figure-html/summarizesteps-1.png) 
 <br>
 
-####The second part asks us to find the interval where number of steps is highest across all days. We'll use the MeanIntervals data frame and subset for the max mean step value.
+The second part asks us to find the interval where number of steps is highest across all days. We'll use the MeanIntervals data frame and subset for the max mean step value.
 <br>
 
 
@@ -146,13 +146,13 @@ subset(MeanIntervals,MeanIntervals$mean==max(MeanIntervals$mean))
 ```
 <br>
 
-####So our 5-minute interval with the highest step mean is **835** or **8:35 AM** to **8:40 AM**.
+So our 5-minute interval with the highest step mean is **835** or **8:35 AM** to **8:40 AM**.
 <br>
 
 ## Imputing missing values
 <br>
 
-####To calculate the number of missing values in *Dat*, we can just subset to NA values:
+To calculate the number of missing values in *Dat*, we can just subset to NA values:
 <br>
 
 
@@ -166,10 +166,10 @@ dim(justNA)
 ```
 <br>
 
-####A total of **2304** values. It also appears that the NA values belong to eight specific dates where all steps for those days are NA. The assignment asks us to replace those NA values with real values, so let's replace all of those days' step values with the mean step values for each interval across the entire non-NA dataset.
+A total of **2304** values. It also appears that the NA values belong to eight specific dates where all steps for those days are NA. The assignment asks us to replace those NA values with real values, so let's replace all of those days' step values with the mean step values for each interval across the entire non-NA dataset.
 <br>
 
-####We already have an existing data frame called *MeanIntervals* where we calculated mean step for each interval. We'll use this frame to overwrite the *justNA* table we made in the earlier step. The *rep* function will repeat the list 8 times because there are eight days we need to overwrite.
+We already have an existing data frame called *MeanIntervals* where we calculated mean step for each interval. We'll use this frame to overwrite the *justNA* table we made in the earlier step. The *rep* function will repeat the list 8 times because there are eight days we need to overwrite.
 <br>
 
 
@@ -178,7 +178,7 @@ justNA$steps <- rep(MeanIntervals$mean,times=8)
 ```
 <br>
 
-####Let's use the merge function to merge *Dat* and *justNA* to create *NewDat*. We can now remove NA values again, and we should be left with all non-NA values.
+Let's use the merge function to merge *Dat* and *justNA* to create *NewDat*. We can now remove NA values again, and we should be left with all non-NA values.
 <br>
 
 
@@ -188,7 +188,7 @@ NewDat <- na.omit(NewDat)
 ```
 <br>
 
-####We'll now repeat the steps we did earlier in the assignment to find the mean and median total number of steps taken per day.
+We'll now repeat the steps we did earlier in the assignment to find the mean and median total number of steps taken per day.
 <br>
 
 
@@ -221,13 +221,13 @@ median(MeanStepsNew$sum)
 ```
 <br>
 
-####It turns out, our new median and mean are equal! This is not so surprising, considering 8 days out of 61 have identical values (10766.19) which is the average and median value of the data set. By swapping out the NA values for mean values, we basically made the dataset more tightly symmetrical around the median value.
+It turns out, our new median and mean are equal! This is not so surprising, considering 8 days out of 61 have identical values (10766.19) which is the average and median value of the data set. By swapping out the NA values for mean values, we basically made the dataset more tightly symmetrical around the median value.
 <br>
 
 ## Are there differences in activity patterns between weekdays and weekends?
 <br>
 
-####First we'll add a factor variable *daytype* to NewDat. Before we can do that, we'll convert *date* from a factor variable to a date, then use *weekdays()* to turn those days into characters, and finally *factor()* to create our factors. Let's go!
+First we'll add a factor variable *daytype* to NewDat. Before we can do that, we'll convert *date* from a factor variable to a date, then use *weekdays()* to turn those days into characters, and finally *factor()* to create our factors. Let's go!
 <br>
 
 ```r
@@ -243,7 +243,7 @@ str(NewDat$daytype)
 ```
 <br>
 
-####Now let's make our plot. But before we can, we'll use ddply twice to summarize the mean steps data for both weekday and weekends, and then we'll rbind those tables to create one table with the summaries for both weekends and weekdays. This final table will be called **AllIntervalMeans**.
+Now let's make our plot. But before we can, we'll use ddply twice to summarize the mean steps data for both weekday and weekends, and then we'll rbind those tables to create one table with the summaries for both weekends and weekdays. This final table will be called **AllIntervalMeans**.
 <br>
 
 
@@ -256,7 +256,7 @@ AllIntervalMeans <- rbind(WkndMeanIntervals,WkdayMeanIntervals)
 ```
 <br>
 
-####Now let's make a lattice graph and be done!
+Now let's make a lattice graph and be done!
 <br>
 
 
@@ -268,7 +268,7 @@ xyplot(AllIntervalMeans$mean ~ AllIntervalMeans$interval | AllIntervalMeans$type
 ![](PA1_template_files/figure-html/makegraph-1.png) 
 <br>
 
-####Comparing these graphs, a lot of things make sense. It appears subjects aren't as active in the mornings on weekends (they are probably sleeping in!) and are more active between 9:30AM and 4:00 PM than during the week (not at work so probably not sitting down).
+Comparing these graphs, a lot of things make sense. It appears subjects aren't as active in the mornings on weekends (they are probably sleeping in!) and are more active between 9:30AM and 4:00 PM than during the week (not at work so probably not sitting down).
 
 
 
